@@ -115,6 +115,19 @@ section.blk{padding-block:56px}
 .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:var(--crema)}
 .split .art{min-height:300px;position:relative;overflow:hidden}
 .split .art svg{position:absolute;inset:0;width:100%;height:100%}
+.wsband{background:var(--roast);color:var(--crema)}
+.wsband .art{display:flex;align-items:flex-end;justify-content:center;gap:clamp(8px,2vw,22px);padding:40px 24px 0;background:var(--basalt)}
+.wsband .art a{display:block;width:clamp(84px,11vw,150px);flex:none}
+.wsband .art a svg{position:static;width:100%;height:auto}
+.wsband .art a:nth-child(1){transform:rotate(-5deg) translateY(10px)}.wsband .art a:nth-child(3){transform:rotate(5deg) translateY(10px)}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.facts span{border:1.5px solid #4a4540;border-radius:999px;padding:6px 13px;font-size:13.5px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+.steps li{display:flex;gap:14px;align-items:flex-start}
+.steps .n{flex:none;width:38px;height:38px;border-radius:999px;background:var(--glow);color:var(--roast);font-family:var(--f-display);font-weight:800;display:flex;align-items:center;justify-content:center}
+.wsform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.wsform .full{grid-column:1/-1}
+select{font:inherit;border:1.5px solid var(--sand);background:#fff;color:var(--roast);padding:11px 12px;width:100%;border-radius:2px;min-height:46px}
 .split .txt{padding:44px 40px;display:flex;flex-direction:column;gap:14px;justify-content:center}
 .dark{background:var(--roast);color:var(--crema)}
 .posts svg{width:100%}
@@ -193,7 +206,7 @@ footer .fine{border-top:1px solid #3a3632;padding-block:16px;font-size:12.5px;co
   header.open nav.main{display:flex} header.dark nav.main{background:var(--roast);border-color:#3a3632} nav.main a{padding:12px 0;font-size:16px}
   .burger{display:block} .tools .order{display:none}
   .grid4{grid-template-columns:repeat(2,minmax(0,1fr))} .grid6{grid-template-columns:repeat(3,minmax(0,1fr))} .grid3{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .split,.prod,.two,.visit,.shop{grid-template-columns:minmax(0,1fr)}
+  .split,.prod,.two,.visit,.shop,.wsform{grid-template-columns:minmax(0,1fr)}
   
   .split .txt{padding:30px 22px} .timeline{grid-template-columns:repeat(2,minmax(0,1fr))}
   footer .cols{grid-template-columns:1fr 1fr}
@@ -204,6 +217,7 @@ footer .fine{border-top:1px solid #3a3632;padding-block:16px;font-size:12.5px;co
   .grid3,.vals{grid-template-columns:minmax(0,1fr)} .recipe{grid-template-columns:repeat(2,1fr)} footer .cols{grid-template-columns:1fr}
   .card .pic{--pad:14px} .card .foot{flex-direction:column;align-items:stretch} .bar{gap:10px}
   .prod .pic{padding:24px}
+  .grid4.who{grid-template-columns:minmax(0,1fr)} .wsmascot{display:none}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.toast{transition:none}.shelf a{transition:none}}
 </style>
@@ -255,7 +269,7 @@ const MERCH = [
 const DRINKS = [['Espresso','إسبريسو',70],['Americano','أمريكانو',80],['Cortado','كورتادو',90],['Flat white','فلات وايت',95],['Latte','لاتيه',100],['V60 single origin','V60 محصول واحد',120],['Cold brew','كولد برو',110],['Qahwa bel-wesh','قهوة بالوش',60]];
 const BAKERY = [['Butter croissant','كرواسون زبدة',70],['Pain au chocolat','بان أو شوكولا',80],['Cookie','كوكيز',55],['Cheesecake','تشيز كيك',120],['Bel-Wesh tiramisu','تيراميسو بالوش',120],['Basbousa espresso cake','بسبوسة إسبريسو',75]];
 const POSTS = ['drop','morning','quote','sign','free','mark','menu','club','space'];
-const NAV = [['shop','Shop','المتجر'],['merch','Merch','ميرش'],['story','Our story','حكايتنا'],['community','Community','المجتمع'],['visit','Visit','زورنا'],['reviews','Reviews','الآراء']];
+const NAV = [['shop','Shop','المتجر'],['merch','Merch','ميرش'],['wholesale','Wholesale','الجملة'],['story','Our story','حكايتنا'],['community','Community','المجتمع'],['visit','Visit','زورنا'],['reviews','Reviews','الآراء']];
 const tr = {Light:'فاتح', Medium:'متوسط', Dark:'غامق', Washed:'مغسولة', Natural:'مجففة', Blend:'خلطة', Ethiopia:'إثيوبيا', Kenya:'كينيا', Colombia:'كولومبيا', Brazil:'البرازيل', Yemen:'اليمن',
   'Whole bean':'حبوب كاملة', Espresso:'إسبريسو', V60:'V60', Kanaka:'كنكة', All:'الكل', Filter:'فلتر', Limited:'محدود'};
 const T = s => lang === 'ar' && tr[s] ? tr[s] : s;
@@ -266,6 +280,7 @@ let filt = {cat:'all', roast:'', process:'', country:''};
 let sel = {grind:'Whole bean', size:'250', qty:1, msize:{}};
 let co = {mode:'pickup', pay:'card', name:'', phone:'', email:'', addr:''};
 let lastOrder = null, rsvp = {}, fbStars = 0;
+let ws = {name:'', biz:'', phone:'', kg:'5–10', type:'cafe', freq:'', msg:'', sent:false};
 const count = () => bag.reduce((n, i) => n + i.qty, 0);
 const subtotal = () => bag.reduce((n, i) => n + i.qty * i.price, 0);
 const price1kg = p => Math.round(p * 3.6 / 10) * 10;
@@ -315,6 +330,11 @@ V.home = () => `
   <div><a class="btn sm" href="#story">${L('Read our story', 'اقرأ حكايتنا')}</a></div></div></div></div></section>
 <section class="blk"><div class="wrap">${sechead(L('Bakery by Loulis', 'مخبوزات من لوليس'), '#visit', L('See the menu', 'شوف المنيو'))}
   <div class="grid3">${BAKERY.slice(3).map(b => `<div class="tile"><div class="lab" style="color:var(--copper)">${L('Baked by Loulis · in store', 'من لوليس · في المحل')}</div><h3 style="margin-top:6px">${esc(L(b[0], b[1]))}</h3><div class="price" style="margin-top:6px">${egp(b[2])}</div></div>`).join('')}</div></div></section>
+<section class="blk" style="padding-top:0"><div class="wrap"><div class="split wsband"><div class="art" aria-hidden="true">${['guji', 'house', 'huila'].map(id => `<a href="#wholesale" tabindex="-1">${A['pack_' + id]}</a>`).join('')}</div><div class="txt">
+  <div class="lab" style="color:var(--glow)">${L('Wholesale · Partner with us', 'الجملة · اشتغل معانا')}</div><h2>${L('We roast in Degla. Your café pours it.', 'بنحمّص في دجلة، وإنت بتقدّم.')}</h2>
+  <p style="color:var(--muted-d)">${L('Fresh specialty coffee for cafés, restaurants, hotels and offices, roasted to order every week.', 'قهوة مختصة طازة للكافيهات والمطاعم والفنادق والمكاتب، بتتحمص حسب الطلب كل أسبوع.')}</p>
+  <div class="facts">${WS_FACTS().map(f => `<span>${f}</span>`).join('')}</div>
+  <div><a class="btn copper" href="#wholesale">${L('Become a wholesale partner', 'اشتغل معانا جملة')}</a></div></div></div></div></section>
 <section class="blk" style="padding-top:0"><div class="wrap">${sechead(L('Merch', 'ميرش'), '#merch', L('Shop merch', 'كل الميرش'))}
   <div class="grid6">${MERCH.map(m => `<a class="card" href="#merch" style="text-decoration:none"><div class="pic" style="--pad:14px">${A['m_' + m.id]}</div><div class="info"><div style="font-size:13.5px;font-weight:600">${esc(L(m.name, m.ar))}</div><div class="notes">${egp(m.price)}</div></div></a>`).join('')}</div></div></section>
 <section class="blk" style="padding-top:0"><div class="wrap">${sechead('@wesh.eg', '#community', L('Community', 'المجتمع'))}
@@ -360,6 +380,45 @@ V.merch = () => `<section class="blk"><div class="wrap"><div class="crumb"><a hr
   <h1 style="font-size:clamp(30px,5vw,44px)">${L('Merch', 'ميرش')}</h1><p class="muted" style="margin:10px 0 28px;max-width:60ch">${L('The same pieces our baristas wear, plus the sticker sheet everyone asks for.', 'نفس اللي الباريستا بتوعنا لابسينه، ومعاهم الستيكرز اللي الكل بيسأل عليها.')}</p>
   <div class="grid3">${MERCH.map(merchCard).join('')}</div>
   <div class="stickers">${['mascot', 'sabah', 'always', 'weshak', 'rush', 'double'].map(k => A['st_' + k]).join('')}</div></div></section>`;
+
+const WS_FACTS = () => [L('Min. order 5 kg', 'أقل طلب 5 كجم'), L('Roasted to order', 'تحميص حسب الطلب'), L('Delivered across Cairo', 'توصيل في كل القاهرة')];
+const WS_TYPES = [['cafe', 'Café', 'كافيه'], ['restaurant', 'Restaurant', 'مطعم'], ['hotel', 'Hotel', 'فندق'], ['office', 'Office', 'مكتب'], ['other', 'Other', 'غير كده']];
+const WS_FREQ = [['once', 'One time', 'مرة واحدة'], ['weekly', 'Weekly', 'كل أسبوع'], ['monthly', 'Monthly', 'كل شهر']];
+function wsRead(){ ['name', 'biz', 'phone', 'kg', 'msg'].forEach(k => { const el = document.getElementById('ws-' + k); if (el) ws[k] = el.value.trim(); }); }
+V.wholesale = () => {
+  const seg = (k, vals) => `<div class="seg">${vals.map(([v, en, ar]) => `<button type="button" data-act="ws" data-k="${k}" data-v="${v}" aria-pressed="${ws[k] === v}">${L(en, ar)}</button>`).join('')}</div>`;
+  const terms = [[L('Minimum order', 'أقل طلب'), L('5 kg', '5 كجم')], [L('Roast days', 'أيام التحميص'), L('Sunday and Wednesday', 'الأحد والأربع')], [L('Order deadline', 'آخر ميعاد للطلب'), L('8:00 PM the day before', '8 بالليل اليوم اللي قبله')], [L('Roasting', 'التحميص'), L('To order, never from stock', 'حسب الطلب، مش من المخزن')], [L('Packing', 'التعبئة'), L('1 kg valve bags, roast date on every bag', 'أكياس 1 كجم بصمام، وتاريخ التحميص على كل كيس')], [L('Delivery', 'التوصيل'), L('Across Cairo, priced by weight and area', 'في كل القاهرة، السعر حسب الوزن والمنطقة')]];
+  const who = [[L('Cafés', 'الكافيهات'), L('A house espresso and a rotating filter, roasted the week you pour it.', 'إسبريسو أساسي وفلتر بيتغير، متحمصين في نفس أسبوع التقديم.')], [L('Restaurants', 'المطاعم'), L('An after-dinner coffee that matches your food, plus Turkish coffee blends.', 'قهوة بعد الأكل تليق بأكلك، ومعاها خلطات قهوة تركي.')], [L('Hotels', 'الفنادق'), L('From breakfast batch brew to lobby espresso.', 'من قهوة الفطار للإسبريسو في اللوبي.')], [L('Offices', 'المكاتب'), L('Fresh beans for the office machine on a fixed schedule.', 'حبوب طازة لمكنة المكتب على ميعاد ثابت.')]];
+  const steps = [[L('Send an inquiry.', 'ابعتلنا.'), L('Tell us what you serve and how much you go through.', 'قولنا بتقدّم إيه وبتستهلك قد إيه.')], [L('Come taste.', 'تعالى دوق.'), L('A cupping at our Degla bar to pick your coffees.', 'جلسة تذوق في بارنا في دجلة تختار فيها قهوتك.')], [L('We dial you in.', 'بنظبطلك.'), L('Our barista sets your recipe on your machine.', 'الباريستا بتاعنا بيظبط الوصفة على مكنتك.')], [L('Fresh every week.', 'طازة كل أسبوع.'), L('Your order is roasted and delivered on your schedule.', 'طلبك بيتحمص ويوصلك في ميعادك.')]];
+  const form = ws.sent ? `<div class="sum" role="status"><h2>${L('Thanks, ', 'شكراً يا ')}${esc(ws.name.split(' ')[0])}${L('.', '')}</h2>
+    <p style="margin-top:8px">${L('We have your inquiry for ', 'وصلنا طلبك لـ')}${esc(ws.biz || L('your business', 'شغلك'))}${L('. We will reply on WhatsApp within one working day.', '. هنرد عليك على واتساب خلال يوم عمل.')}</p>
+    <p class="note" style="margin-top:10px">${L('Preview only: this inquiry was not sent anywhere.', 'ده عرض تجريبي: الطلب ده ما اتبعتش لأي حد.')}</p>
+    <button class="btn ghost" type="button" data-act="wsreset" style="margin-top:16px">${L('Send another', 'ابعت طلب تاني')}</button></div>`
+  : `<div class="wsform">
+    <div class="field"><label for="ws-name">${L('Full name', 'الاسم')} *</label><input type="text" id="ws-name" autocomplete="name" value="${esc(ws.name)}"></div>
+    <div class="field"><label for="ws-biz">${L('Business name', 'اسم المكان')}</label><input type="text" id="ws-biz" autocomplete="organization" value="${esc(ws.biz)}"></div>
+    <div class="field"><label for="ws-phone">${L('Mobile (WhatsApp)', 'موبايل (واتساب)')} *</label><input type="tel" id="ws-phone" inputmode="tel" autocomplete="tel" value="${esc(ws.phone)}"></div>
+    <div class="field"><label for="ws-kg">${L('Coffee per month', 'استهلاك القهوة في الشهر')}</label><select id="ws-kg">${['5–10', '10–25', '25–50', '50+'].map(v => `<option value="${v}" ${ws.kg === v ? 'selected' : ''}>${v} ${L('kg', 'كجم')}</option>`).join('')}</select></div>
+    <div class="full"><div class="lab" style="margin-bottom:8px">${L('Business type', 'نوع المكان')}</div>${seg('type', WS_TYPES)}</div>
+    <div class="full"><div class="lab" style="margin-bottom:8px">${L('Order frequency', 'هتطلب كل قد إيه')} *</div>${seg('freq', WS_FREQ)}</div>
+    <div class="field full"><label for="ws-msg">${L('Message', 'رسالة')}</label><textarea id="ws-msg" placeholder="${L('Your machine, your current coffee, anything we should know', 'مكنتك، القهوة اللي بتستخدمها دلوقتي، أي حاجة نعرفها')}">${esc(ws.msg)}</textarea></div>
+    <div class="full"><p class="err" id="ws-err" role="alert"></p><button class="btn" type="button" data-act="wssend">${L('Send inquiry', 'ابعت الطلب')}</button></div></div>`;
+  return `<section class="blk"><div class="wrap"><div class="crumb"><a href="#home">${L('Home', 'الرئيسية')}</a> / ${L('Wholesale', 'الجملة')}</div>
+  <div class="two" style="align-items:end"><div><div class="lab" style="color:var(--copper)">${L('Partner with us', 'اشتغل معانا')}</div><h1 style="font-size:clamp(32px,5.5vw,52px);margin-top:6px">${L('Wholesale', 'الجملة')}</h1>
+  <p class="muted" style="margin-top:12px;max-width:56ch">${L('We roast specialty coffee in Degla every week, and we love working with businesses that care where their coffee comes from.', 'بنحمّص قهوة مختصة في دجلة كل أسبوع، وبنحب نشتغل مع الأماكن اللي فارق معاها قهوتها جاية منين.')}</p>
+  <div class="row" style="margin-top:18px"><button class="btn copper" type="button" data-act="wsjump">${L('Send an inquiry', 'ابعت طلبك')}</button><span class="note">${WS_FACTS().join(' · ')}</span></div></div>
+  <div class="slogan-ar" lang="ar" dir="rtl" style="font-size:clamp(30px,4vw,44px);text-align:end">محمّص في دجلة</div></div></div></section>
+<section class="blk" style="padding-top:0"><div class="wrap">${sechead(L('Who we roast for', 'بنحمّص لمين'))}
+  <div class="grid4 who">${who.map(w => `<div class="tile"><h3>${w[0]}</h3><p class="muted" style="font-size:14.5px;margin-top:6px">${w[1]}</p></div>`).join('')}</div></div></section>
+<section class="blk" style="padding-top:0"><div class="wrap"><div class="two">
+  <div class="menu"><div class="lab" style="color:var(--glow)">${L('Our wholesale terms', 'شروط الجملة')}</div>${terms.map(t => `<div class="li"><span style="color:var(--muted-d)">${t[0]}</span><span>${t[1]}</span></div>`).join('')}</div>
+  <div><div class="lab" style="color:var(--copper);margin-bottom:14px">${L('How it works', 'بنشتغل إزاي')}</div><ol class="steps">${steps.map((s, i) => `<li><span class="n">${i + 1}</span><span><b>${s[0]}</b> ${s[1]}</span></li>`).join('')}</ol></div></div></div></section>
+<section class="blk" style="padding-top:0"><div class="wrap">${sechead(L('On our wholesale list', 'في قائمة الجملة'), '#shop', L('See every coffee', 'شوف كل القهوة'))}
+  <div class="grid4">${COFFEES.slice(0, 4).map(c => `<article class="card"><a class="pic" href="#coffee-${c.id}" aria-label="${esc(cname(c))}">${A['pack_' + c.id]}</a><div class="info"><div class="lab">${esc(L(c.origin, c.originAr))}</div><h3>${esc(cname(c))}</h3><div class="notes">${L('1 kg bags · price list with your quote', 'أكياس 1 كجم · الأسعار مع عرض السعر')}</div></div></article>`).join('')}</div></div></section>
+<section class="blk" style="padding-top:0" id="ws-inquiry"><div class="wrap"><div class="two">
+  <div><h2>${L('Interested in becoming a wholesale partner?', 'حابب تشتغل معانا جملة؟')}</h2><p class="muted" style="margin-top:10px">${L('Send us a few details and we will reply on WhatsApp within one working day.', 'ابعتلنا شوية تفاصيل وهنرد عليك على واتساب خلال يوم عمل.')}</p><div class="wsmascot" style="width:min(200px,50%);margin-top:20px">${A.mascot_wave}</div></div>
+  <div>${form}</div></div></div></section>`;
+};
 
 V.story = () => `<section class="dark"><div class="wrap" style="padding-block:60px"><div class="two"><div><div class="lab" style="color:var(--glow)">${L('Our story', 'حكايتنا')}</div>
   <h1 style="margin-top:10px">${L('We’re obsessed with what rises to the top.', 'مهووسين باللي بيطلع على الوش.')}</h1></div>
@@ -450,7 +509,7 @@ function chrome(){
   $('#baglink').innerHTML = `${L('Bag', 'الشنطة')}<b>${count()}</b>`;
   $('#orderbtn').textContent = L('Order ahead', 'اطلب قبل ما تيجي');
   $('#foot').innerHTML = `<div class="cols"><div><img src="${A.logo_light}" alt="Wesh" style="height:30px"><div class="slogan-ar" style="margin-top:14px">دايمًا بالوش</div><div class="lab" style="color:var(--muted-d)">Always bel-wesh</div></div>
-   <div><h4>${L('Shop', 'المتجر')}</h4><a href="#shop">${L('Coffee', 'القهوة')}</a><a href="#merch">${L('Merch', 'ميرش')}</a><a href="#bag">${L('Bag', 'الشنطة')}</a></div>
+   <div><h4>${L('Shop', 'المتجر')}</h4><a href="#shop">${L('Coffee', 'القهوة')}</a><a href="#merch">${L('Merch', 'ميرش')}</a><a href="#wholesale">${L('Wholesale', 'الجملة')}</a><a href="#bag">${L('Bag', 'الشنطة')}</a></div>
    <div><h4>${L('Wesh', 'وش')}</h4><a href="#story">${L('Our story', 'حكايتنا')}</a><a href="#community">${L('Community', 'المجتمع')}</a><a href="#visit">${L('Visit', 'زورنا')}</a><a href="#reviews">${L('Reviews', 'الآراء')}</a></div>
    <div><h4>${L('Find us', 'مكاننا')}</h4><p style="color:var(--muted-d);font-size:14.5px">${L('Road 9 area, Degla, Maadi, Cairo', 'منطقة شارع 9، دجلة، المعادي، القاهرة')}<br>@wesh.eg · #دايمًا_بالوش</p></div></div>
    <div class="fine">${L('Preview build, November 2026. Prices, hours, the address and social handles are placeholders. Bakery by Loulis.', 'نسخة تجريبية، نوفمبر 2026. الأسعار والمواعيد والعنوان وحسابات السوشيال مبدئية. المخبوزات من لوليس.')}</div>`;
@@ -478,6 +537,15 @@ document.addEventListener('click', e => {
   } else if (a === 'addmerch') {
     const m = MERCH.find(x => x.id === d.id), s = m.sizes ? (sel.msize[m.id] || 'M') : '';
     addToBag({key:`${m.id}|${s}`, name:m.name, ar:m.ar, art:'m_' + m.id, opt:s ? `Size ${s}` : 'One size', optAr:s ? `مقاس ${s}` : 'مقاس واحد', price:m.price, qty:1});
+  } else if (a === 'ws') { wsRead(); ws[d.k] = d.v; render(true); }
+  else if (a === 'wsjump') { const t = $('#ws-inquiry'); if (t) t.scrollIntoView({behavior:'smooth'}); }
+  else if (a === 'wsreset') { ws = {name:'', biz:'', phone:'', kg:'5–10', type:'cafe', freq:'', msg:'', sent:false}; render(true); }
+  else if (a === 'wssend') {
+    wsRead(); const err = $('#ws-err');
+    if (ws.name.length < 2) { err.textContent = L('Add your name so we know who to reply to.', 'اكتب اسمك عشان نعرف نرد على مين.'); $('#ws-name').focus(); return; }
+    if (ws.phone.replace(/\D/g, '').length < 10) { err.textContent = L('Add a WhatsApp number we can reach you on.', 'اكتب رقم واتساب نقدر نوصلك عليه.'); $('#ws-phone').focus(); return; }
+    if (!ws.freq) { err.textContent = L('Pick how often you would order.', 'اختار هتطلب كل قد إيه.'); return; }
+    ws.sent = true; render(true); const t = $('#ws-inquiry'); if (t) t.scrollIntoView();
   } else if (a === 'msize') { sel.msize[d.id] = d.v; render(true); }
   else if (a === 'cat') { filt.cat = d.v; render(true); }
   else if (a === 'filt') { filt[d.k] = filt[d.k] === d.v ? '' : d.v; render(true); }
